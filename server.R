@@ -29,13 +29,16 @@ shinyServer(function(input, output, session) {
       pdftests <- sapply(
         file_info()$datapath, function(x) try(pdf_info(x), silent = TRUE)
       )
-      if(any(class(pdftests) == "try-error")) {
-        return(FALSE)
+      ckclss <- sapply(pdftests, class)
+      names(ckclss) <- seq_along(ckclss)
+      if(any(ckclss == "try-error")) {
+        res <- cbind(file_info(), ckclss)
+        return(res)
       } else {
-        return(TRUE)
+        return("Yes")
       }
     }
-    return(FALSE)
+    return("No")
   })
 
   submitter_ok <- reactive({
@@ -78,15 +81,6 @@ shinyServer(function(input, output, session) {
     }
   })
 
-  # BATCH TESTS
-  test_pdf_text <- function() {
-    if(is_pdf() & with_txt()) {
-      return(TRUE)
-    } else {
-      return(FALSE)
-    }
-  }
-
   observe({
     if(submitter_ok() & submitter_email_ok() & type_ok()) {
       hide("spacer", anim = TRUE, animType = "slide")
@@ -99,7 +93,8 @@ shinyServer(function(input, output, session) {
 
   observe({
     if(!is.null(file_info())) {
-      if(is_pdf()) {
+      pdf_chk <- is_pdf()
+      if(identical(pdf_chk, "Yes")) {
         show("submit_btn", anim = TRUE, animType = "fade")
         hide("pad_foot_2")
         output$to_upl_files <- renderTable(
@@ -109,13 +104,15 @@ shinyServer(function(input, output, session) {
           bordered = FALSE,
           width = "100%"
         )
-      } else {
+      } else if(class(pdf_chk) == "data.frame") {
+        bad_fil <- dplyr::filter(pdf_chk, ckclss == "try-error")
         createAlert(
           session,
           "not_a_pdf",
-          title = "Not a PDF",
-          content = paste("One or more files are not PDF or may be damaged.
-                          Please check all files and try again."),
+          title = "PDF problem",
+          content = paste("These files are not PDFs or are damaged:<br>&nbsp&nbsp",
+                          paste(bad_fil$name, collapse = "<br>&nbsp&nbsp"),
+                          "<br>Please remove or replace these with valid PDFs."),
           style = "error",
           dismiss = TRUE
         )
@@ -135,10 +132,14 @@ shinyServer(function(input, output, session) {
     if(key_ok()) {
       showModal(modalDialog(
         title = HTML("<h3>Submit</h3>"),
-        HTML(paste("<h4>Submit these",
+        HTML(paste("<h5>Submit these",
                    dim(file_info())[1],
-                   "PDFs to ESAdocs?</h4>")
+                   "PDFs to ESAdocs?</h5>")
         ),
+        hidden(div(
+          id = "waiting",
+          p("Transferring...")
+        )),
         size = "s",
         footer = tagList(
           actionButton(
@@ -165,6 +166,12 @@ shinyServer(function(input, output, session) {
 
   observeEvent(input$real_submit, {
     res <- copy_upload_file()
+    subf <- file.path("/Users/jacobmalcom/Work/Data/bulk_ESAdocs/rdas",
+                      paste0("bulk_upload_", dim(res)[1],
+                             "_docs_", Sys.Date(), "_", rand_str(5), ".rda"))
+    save(res, file = subf)
+    show("waiting")
+    scp_res <- copy_to_ocrvm(res)
     file.remove(file_info()$datapath)
     updateSelectInput(session, "doctype", selected = "not_selected")
     hide("submit_btn", anim = TRUE, animType = "slide")
@@ -176,7 +183,8 @@ shinyServer(function(input, output, session) {
       session,
       "success",
       title = "Success!",
-      content = paste("Your", dim(file_info())[1], "ESA-related PDFs were uploaded"),
+      content = paste("Your", dim(file_info())[1],
+                      "ESA-related PDFs were uploaded"),
       style = "success",
       dismiss = TRUE
     )
@@ -204,14 +212,25 @@ shinyServer(function(input, output, session) {
   copy_upload_file <- function() {
     pdf_paths <- sapply(file_info()$name, prep_pdfpath)
     cp_res <- file.copy(file_info()$datapath, pdf_paths, overwrite = FALSE)
-    res_dat <- rbind(file_info(), cp_res, pdf_paths)
-    if(any(!cp_res)) {
-      output$msg <- renderTable(res_dat)
-    }
+    res_dat <- cbind(file_info(), cp_res, pdf_paths,
+                     rep(input$submitter, length(pdf_paths)),
+                     rep(input$submitter_email, length(pdf_paths)),
+                     rep(input$doctype, length(pdf_paths)))
+    # if(any(!cp_res)) {
+    #   output$msg <- renderTable(res_dat)
+    # }
     return(res_dat)
   }
 
-
+  copy_to_ocrvm <- function(df) {
+    get_cmd <- function(x) {
+      paste0("scp -C ", x, " ", Sys.getenv("OCR_SERVER"), "/", input$doctype, "/")
+    }
+    cmd <- sapply(df$pdf_paths, get_cmd)
+    observe({print(cmd)})
+    scp_res <- sapply(cmd, system, intern = TRUE, wait = TRUE)
+    return(scp_res)
+  }
 
   ###########################################################################
   ## CANCELS

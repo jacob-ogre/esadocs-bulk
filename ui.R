@@ -144,6 +144,7 @@ body <- dashboardBody(
       fluidRow(
         column(2),
         column(8,
+          tableOutput("msg"),
           shinyBS::bsAlert("success")
         ),
         column(2),
