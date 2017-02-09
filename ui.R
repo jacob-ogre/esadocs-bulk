@@ -142,6 +142,11 @@ body <- dashboardBody(
         ))
       ),
       fluidRow(
+        column(2),
+        column(8,
+          shinyBS::bsAlert("success")
+        ),
+        column(2),
         hidden(div(
           id = "submit_btn",
           br(),

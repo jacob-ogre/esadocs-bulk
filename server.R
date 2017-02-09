@@ -1,6 +1,6 @@
 # BSD_2_clause
 
-options(shiny.maxRequestSize=10*1024^2)
+options(shiny.maxRequestSize=30*1024^2)
 
 rand_str <- function(len=30) {
   str <- paste(
@@ -172,6 +172,14 @@ shinyServer(function(input, output, session) {
     reset("upload_file")
     removeClass(id = "key_code", "attention")
     removeModal()
+    createAlert(
+      session,
+      "success",
+      title = "Success!",
+      content = paste("Your", dim(file_info())[1], "ESA-related PDFs were uploaded"),
+      style = "success",
+      dismiss = TRUE
+    )
   })
 
   #####################
