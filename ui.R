@@ -153,6 +153,18 @@ body <- dashboardBody(
             ),
             column(2,
               br(),
+              tipify(
+                textInput(
+                  inputId = "key_code",
+                  label = "Upload key",
+                  width = "110%",
+                  value = NA,
+                  placeholder = "alpha-numeric"
+                ),
+                title = "From the shared OneDrive file",
+                trigger = "focus",
+                placement = "right"
+              ),
               column(6,
                 actionButton(
                   "cancel",
