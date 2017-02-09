@@ -1,0 +1,208 @@
+hr {
+  border-color: #808080 !important;
+  height: 2px;
+}
+
+hr.style-four {
+  border-top-width: 2px;
+  border-top-color: #d9d9d9 !important;
+}
+
+.box {
+  box-shadow: 2px 2px 2px #d9d9d9;
+}
+
+div.outer {
+  background-color: white;
+  top: 50px;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: 0;
+}
+
+/* Customize fonts */
+body, label, input, button, select {
+  font-family: 'Open Sans';
+  font-weight: 300;
+}
+h1, h2, h3, h4 { font-weight: 400; }
+
+.search-res {
+  background-color:white;
+  border-bottom: 1px solid #f2f2f2;
+  padding-bottom: 5px;
+}
+
+.selectize-input {
+  border-color: white;
+  font-size: small;
+  margin-bottom: -10px;
+}
+
+.selectize-dropdown {
+  font-size: small;
+}
+
+.btn-default, .sbs-toggle-button, .btn-xs {
+  border-color: white;
+}
+
+.btn-default, .sbs-toggle-button, .action-button {
+  border-radius: 1px;
+  font-weight: bold;
+}
+
+.btn-default, .action-button:hover {
+  border-radius: 1px;
+  border-color: white;
+}
+
+/* DATE RANGE SELECTOR */
+.input-sm {
+  background-color: #f2f2f2;
+  border-color: white;
+  color: #404040;
+}
+
+.input-group-addon {
+  background-color: #404040;
+  color: white;
+}
+/* DATE RANGE SELECTOR */
+
+.dropdown-toggle {
+  border-color: white;
+  font-size: small;
+}
+
+.dropdown-menu {
+  font-size: small;
+  padding-left: 10px;
+  border-radius: 1px;
+}
+
+img {
+  display: block;
+  margin: auto;
+}
+
+.info-div {
+  color: #009933;
+  padding-top: 3px;
+  padding-bottom: 3px;
+}
+
+.popover {
+  border-radius: 1px;
+  width: 350px;
+  max-width: 350px;
+}
+
+.popover-title {
+  font-size: 110%;
+  font-weight: bold;
+}
+
+.popover-content {
+  font-size: 90%;
+  font-weight: lighter;
+}
+
+.nav-tabs>li>a, .nav-tabs>li.active {
+  border-radius: 1px;
+}
+
+label {
+  color: #000000;
+  font-size: large;
+}
+
+.shiny-text-output, .shiny-bound-output {
+  color: #262626;
+  font-size: large;
+}
+
+.warnbadge {
+  background-color: #F44336;
+  color: white;
+  border-radius: 3px;
+  border-color: red;
+  font-size: larger;
+  font-weight: 800;
+  max-width: 20%;
+  text-align: center;
+}
+
+#input_example {
+  color: #e6e6e6;
+  background-color: #e6e6e6;
+}
+
+input.form-contol, input[type=text], [type=text].form-contol {
+  padding-left: 15px !important;
+}
+
+.alert-success {
+  background-color: #4CAF50;
+  border-radius: 2px;
+}
+
+.alert-info {
+  background-color: #8C9EFF;
+  border-radius: 2px;
+}
+
+.alert-error {
+  background-color: #F44336;
+  border-radius: 2px;
+  font-size: larger;
+}
+
+.alert-error-alt {
+  background-color: #F44336;
+  border-radius: 2px;
+  color: white;
+  font-size: large;
+  padding-top: 10px;
+  padding-bottom: 10px;
+}
+
+.attention {
+  background-color: #FFCDD2 !important;
+  border-radius: 3px;
+}
+
+.req_col {
+  font-weight: 300;
+}
+
+.opt_col {
+  font-weight: 800;
+  font-style: italic;
+}
+
+.progress {
+  height: 22px;
+  font-weight: bold;
+  font-size: 14pt;
+}
+
+.bar-danger {
+  background-color: #E12834;
+}
+
+//
+// .bar-danger:after {
+//   background-image: linear-gradient(45deg, rgba(255,255,255,0.15) 25%, transparent 25%, transparent 50%, rgba(255,255,255,0.15) 50%, rgba(255,255,255,0.15) 75%, transparent 75%, transparent);
+//   background-size: 40px 40px;
+//   color: #ffffff;
+//   content: 'HELLO';
+//   float: left;
+//   font-size: 12px;
+//   font-weight: bold;
+//   line-height: 23px;
+//   text-align: center;
+//   visibility: visible;
+// }
+
