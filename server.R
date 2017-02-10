@@ -136,6 +136,7 @@ shinyServer(function(input, output, session) {
                    dim(file_info())[1],
                    "PDFs to ESAdocs?</h5>")
         ),
+        pdf_paths <- sapply(file_info()$name, prep_pdfpath),
         hidden(div(
           id = "waiting",
           p("Transferring...")
@@ -166,7 +167,7 @@ shinyServer(function(input, output, session) {
 
   observeEvent(input$real_submit, {
     res <- copy_upload_file()
-    subf <- file.path("/Users/jacobmalcom/Work/Data/bulk_ESAdocs/rdas",
+    subf <- file.path("/home/jacobmalcom/Data/bulk_ESAdocs", "rda",
                       paste0("bulk_upload_", dim(res)[1],
                              "_docs_", Sys.Date(), "_", rand_str(5), ".rda"))
     save(res, file = subf)
@@ -200,10 +201,7 @@ shinyServer(function(input, output, session) {
     fname <- gsub(x = fname,
                   pattern = ".pdf$|.PDF$",
                   replacement = paste0("_", rand_str(5), ".pdf"))
-    # dest <- file.path("/home/jacobmalcom/Data/bulk_ESAdocs",
-    #                   input$doctype,
-    #                   fname)
-    dest <- file.path("/Users/jacobmalcom/Work/Data/bulk_ESAdocs",
+    dest <- file.path("/home/jacobmalcom/Data/bulk_ESAdocs",
                       input$doctype,
                       fname)
     return(dest)
@@ -216,9 +214,6 @@ shinyServer(function(input, output, session) {
                      rep(input$submitter, length(pdf_paths)),
                      rep(input$submitter_email, length(pdf_paths)),
                      rep(input$doctype, length(pdf_paths)))
-    # if(any(!cp_res)) {
-    #   output$msg <- renderTable(res_dat)
-    # }
     return(res_dat)
   }
 
@@ -226,9 +221,10 @@ shinyServer(function(input, output, session) {
     get_cmd <- function(x) {
       paste0("scp -C ", x, " ", Sys.getenv("OCR_SERVER"), "/", input$doctype, "/")
     }
-    cmd <- sapply(df$pdf_paths, get_cmd)
-    observe({print(cmd)})
-    scp_res <- sapply(cmd, system, intern = TRUE, wait = TRUE)
+    cmd <- paste0("scp -C ", paste(df$pdf_paths, collapse = " "), " ", 
+                  Sys.getenv("OCR_SERVER"), "/", input$doctype, "/")
+    output$msg2 <- renderText({cmd})
+    scp_res <- system(cmd, wait = TRUE)
     return(scp_res)
   }
 
