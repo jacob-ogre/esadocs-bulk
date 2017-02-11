@@ -92,6 +92,12 @@ shinyServer(function(input, output, session) {
   })
 
   observe({
+    if(input$doctype != "not_selected") {
+      removeClass("docdiv", "attn_outline")
+    }
+  })
+
+  observe({
     if(!is.null(file_info())) {
       pdf_chk <- is_pdf()
       if(identical(pdf_chk, "Yes")) {
@@ -104,6 +110,19 @@ shinyServer(function(input, output, session) {
           bordered = FALSE,
           width = "100%"
         )
+        if(dim(file_info())[1] <= 5) {
+          createAlert(
+            session,
+            "too_few",
+            title = "Not many docs",
+            content = paste("Please consider using the",
+                            "<a href='https://esadocs.cci-dev.org/esadocs-upload/'>",
+                            "ESAdocs Upload</a> app. Adding document data during",
+                            "manually during upload can really improve search results."),
+            style = "warning",
+            dismiss = TRUE
+          )
+        }
       } else if(class(pdf_chk) == "data.frame") {
         bad_fil <- dplyr::filter(pdf_chk, ckclss == "try-error")
         createAlert(
@@ -136,7 +155,11 @@ shinyServer(function(input, output, session) {
                    dim(file_info())[1],
                    "PDFs to ESAdocs?</h5>")
         ),
-        pdf_paths <- sapply(file_info()$name, prep_pdfpath),
+        hidden(div(
+          id = "save_error",
+          p(style = "color:red; font-weight:bold; font-size:larger",
+            "WARNING: Upload record failed to save")
+        )),
         hidden(div(
           id = "waiting",
           p("Transferring...")
@@ -167,28 +190,51 @@ shinyServer(function(input, output, session) {
 
   observeEvent(input$real_submit, {
     res <- copy_upload_file()
-    subf <- file.path("/home/jacobmalcom/Data/bulk_ESAdocs", "rda",
+    # subf <- file.path("/home/jacobmalcom/Data/bulk_ESAdocs", "rda",
+    #                   paste0("bulk_upload_", dim(res)[1],
+    #                          "_docs_", Sys.Date(), "_", rand_str(5), ".rda"))
+    subf <- file.path("/Users/jacobmalcom/Work/Data/bulk_ESAdocs", "rda",
                       paste0("bulk_upload_", dim(res)[1],
                              "_docs_", Sys.Date(), "_", rand_str(5), ".rda"))
-    save(res, file = subf)
+    sav_dat <- try(save(res, file = subf), silent = TRUE)
+    if(class(sav_dat) == "try-error") {
+      show("save_err")
+    }
     show("waiting")
     scp_res <- copy_to_ocrvm(res)
-    file.remove(file_info()$datapath)
-    updateSelectInput(session, "doctype", selected = "not_selected")
-    hide("submit_btn", anim = TRUE, animType = "slide")
-    show("pad_foot_2", anim = TRUE, animType = "slide")
-    reset("upload_file")
-    removeClass(id = "key_code", "attention")
-    removeModal()
-    createAlert(
-      session,
-      "success",
-      title = "Success!",
-      content = paste("Your", dim(file_info())[1],
-                      "ESA-related PDFs were uploaded"),
-      style = "success",
-      dismiss = TRUE
-    )
+    if(all(scp_res == 0)) {
+      file.remove(file_info()$datapath)
+      updateSelectInput(session, "doctype", selected = "not_selected")
+      addClass("docdiv", "attn_outline")
+      hide("submit_btn", anim = TRUE, animType = "slide")
+      # hide("pad_foot", anim = TRUE, animType = "slide")
+      # hide("pad_foot_2", anim = TRUE, animType = "slide")
+      reset("upload_file")
+      removeClass(id = "key_code", "attention")
+      removeModal()
+      createAlert(
+        session,
+        "success",
+        title = "Success!",
+        content = paste("Your", dim(file_info())[1],
+                        "ESA-related PDFs were uploaded."),
+        style = "success",
+        dismiss = TRUE
+      )
+    } else {
+      createAlert(
+        session,
+        "success",
+        title = "Error!",
+        content = paste("Your", dim(file_info())[1],
+                        "ESA-related PDFs were uploaded but were not",
+                        "copied to the processing server. Please",
+                        "<a href='esa@defenders.org'>contact us</a> if the",
+                        "problem persists."),
+        style = "success",
+        dismiss = TRUE
+      )
+    }
   })
 
   #####################
@@ -201,7 +247,10 @@ shinyServer(function(input, output, session) {
     fname <- gsub(x = fname,
                   pattern = ".pdf$|.PDF$",
                   replacement = paste0("_", rand_str(5), ".pdf"))
-    dest <- file.path("/home/jacobmalcom/Data/bulk_ESAdocs",
+    # dest <- file.path("/home/jacobmalcom/Data/bulk_ESAdocs",
+    #                   input$doctype,
+    #                   fname)
+    dest <- file.path("/Users/jacobmalcom/Work/Data/bulk_ESAdocs",
                       input$doctype,
                       fname)
     return(dest)
@@ -221,9 +270,8 @@ shinyServer(function(input, output, session) {
     get_cmd <- function(x) {
       paste0("scp -C ", x, " ", Sys.getenv("OCR_SERVER"), "/", input$doctype, "/")
     }
-    cmd <- paste0("scp -C ", paste(df$pdf_paths, collapse = " "), " ", 
+    cmd <- paste0("scp -C ", paste(df$pdf_paths, collapse = " "), " ",
                   Sys.getenv("OCR_SERVER"), "/", input$doctype, "/")
-    output$msg2 <- renderText({cmd})
     scp_res <- system(cmd, wait = TRUE)
     return(scp_res)
   }

@@ -13,8 +13,8 @@ library(stringr)
 
 # options(shiny.reactlog=TRUE)
 system("touch /home/shiny/esadocs-upload/restart.txt", intern = FALSE)
-readRenviron("/home/jacobmalcom/.Renviron")
-# readRenviron("/Users/jacobmalcom/.Renviron")
+# readRenviron("/home/jacobmalcom/.Renviron")
+readRenviron("/Users/jacobmalcom/.Renviron")
 
 elastic::connect()
 

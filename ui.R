@@ -72,25 +72,27 @@ body <- dashboardBody(
               )
             ),
             column(4,
-              tipify(
-                selectInput(
-                  inputId = "doctype",
-                  label = "Document type",
-                  choices = list(
-                    "Select one" = "not_selected",
-                    "candidate doc" = "candidate",
-                    "conserv. agreement" = "conserv_agmt",
-                    "consultation" = "consultation",
-                    "Federal Register" = "federal_register",
-                    "five-year review" = "five_year_review",
-                    "miscellaneous" = "misc",
-                    "policy" = "policy",
-                    "recovery plan" = "recovery_plan"),
-                  width = "110%"
-                ),
-                title = "All docs in one upload should be the same type",
-                trigger = "focus",
-                placement = "top"
+              div(id = "docdiv",
+                tipify(
+                  selectInput(
+                    inputId = "doctype",
+                    label = "Document type",
+                    choices = list(
+                      "Select one" = "not_selected",
+                      "candidate doc" = "candidate",
+                      "conserv. agreement" = "conserv_agmt",
+                      "consultation" = "consultation",
+                      "Federal Register" = "federal_register",
+                      "five-year review" = "five_year_review",
+                      "miscellaneous" = "misc",
+                      "policy" = "policy",
+                      "recovery plan" = "recovery_plan"),
+                    width = "110%"
+                  ),
+                  title = "All docs in one upload should be the same type",
+                  trigger = "focus",
+                  placement = "top"
+                )
               )
             )
           )
@@ -144,9 +146,13 @@ body <- dashboardBody(
       fluidRow(
         column(2),
         column(8,
-          textOutput("msg2"),
-          textOutput("msg3"),
-          tableOutput("msg"),
+          shinyBS::bsAlert("too_few")
+        ),
+        column(2)
+      ),
+      fluidRow(
+        column(2),
+        column(8,
           shinyBS::bsAlert("success")
         ),
         column(2),

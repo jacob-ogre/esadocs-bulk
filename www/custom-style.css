@@ -173,6 +173,14 @@ input.form-contol, input[type=text], [type=text].form-contol {
   border-radius: 3px;
 }
 
+.attn_outline {
+  border-color: red;
+  border-radius: 2px;
+  border-style: solid;
+  border-width: 1px;
+  padding: 10px;
+}
+
 .req_col {
   font-weight: 300;
 }
