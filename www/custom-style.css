@@ -178,7 +178,9 @@ input.form-contol, input[type=text], [type=text].form-contol {
   border-radius: 2px;
   border-style: solid;
   border-width: 1px;
-  padding: 10px;
+  padding-left: 10px;
+  padding-right: 10px;
+  padding-bottom: 10px;
 }
 
 .req_col {

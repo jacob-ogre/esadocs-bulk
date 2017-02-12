@@ -190,12 +190,12 @@ shinyServer(function(input, output, session) {
 
   observeEvent(input$real_submit, {
     res <- copy_upload_file()
-    # subf <- file.path("/home/jacobmalcom/Data/bulk_ESAdocs", "rda",
-    #                   paste0("bulk_upload_", dim(res)[1],
-    #                          "_docs_", Sys.Date(), "_", rand_str(5), ".rda"))
-    subf <- file.path("/Users/jacobmalcom/Work/Data/bulk_ESAdocs", "rda",
+    subf <- file.path("/home/jacobmalcom/Data/bulk_ESAdocs", "rda",
                       paste0("bulk_upload_", dim(res)[1],
                              "_docs_", Sys.Date(), "_", rand_str(5), ".rda"))
+    # subf <- file.path("/Users/jacobmalcom/Work/Data/bulk_ESAdocs", "rda",
+    #                   paste0("bulk_upload_", dim(res)[1],
+    #                          "_docs_", Sys.Date(), "_", rand_str(5), ".rda"))
     sav_dat <- try(save(res, file = subf), silent = TRUE)
     if(class(sav_dat) == "try-error") {
       show("save_err")
@@ -207,8 +207,6 @@ shinyServer(function(input, output, session) {
       updateSelectInput(session, "doctype", selected = "not_selected")
       addClass("docdiv", "attn_outline")
       hide("submit_btn", anim = TRUE, animType = "slide")
-      # hide("pad_foot", anim = TRUE, animType = "slide")
-      # hide("pad_foot_2", anim = TRUE, animType = "slide")
       reset("upload_file")
       removeClass(id = "key_code", "attention")
       removeModal()
@@ -231,9 +229,13 @@ shinyServer(function(input, output, session) {
                         "copied to the processing server. Please",
                         "<a href='esa@defenders.org'>contact us</a> if the",
                         "problem persists."),
-        style = "success",
+        style = "error",
         dismiss = TRUE
       )
+      updateSelectInput(session, "doctype", selected = "not_selected")
+      addClass("docdiv", "attn_outline")
+      removeClass(id = "key_code", "attention")
+      removeModal()
     }
   })
 
@@ -247,12 +249,12 @@ shinyServer(function(input, output, session) {
     fname <- gsub(x = fname,
                   pattern = ".pdf$|.PDF$",
                   replacement = paste0("_", rand_str(5), ".pdf"))
-    # dest <- file.path("/home/jacobmalcom/Data/bulk_ESAdocs",
-    #                   input$doctype,
-    #                   fname)
-    dest <- file.path("/Users/jacobmalcom/Work/Data/bulk_ESAdocs",
+    dest <- file.path("/home/jacobmalcom/Data/bulk_ESAdocs",
                       input$doctype,
                       fname)
+    # dest <- file.path("/Users/jacobmalcom/Work/Data/bulk_ESAdocs",
+    #                   input$doctype,
+    #                   fname)
     return(dest)
   }
 
