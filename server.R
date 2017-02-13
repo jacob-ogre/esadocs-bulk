@@ -269,11 +269,9 @@ shinyServer(function(input, output, session) {
   }
 
   copy_to_ocrvm <- function(df) {
-    get_cmd <- function(x) {
-      paste0("scp -C ", x, " ", Sys.getenv("OCR_SERVER"), "/", input$doctype, "/")
-    }
     cmd <- paste0("scp -C ", paste(df$pdf_paths, collapse = " "), " ",
-                  Sys.getenv("OCR_SERVER"), "/", input$doctype, "/")
+                  Sys.getenv("OCR_SERVER"), ":", Sys.getenv("OCR_PATH"),
+                  "/", input$doctype, "/")
     scp_res <- system(cmd, wait = TRUE)
     return(scp_res)
   }
