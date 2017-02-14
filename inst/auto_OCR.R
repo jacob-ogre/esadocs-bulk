@@ -8,6 +8,7 @@ library(parallel)
 
 OCR_proc <- function(infile) {
   outf <- gsub(infile, pattern = "bulk_ESAdocs", replacement = "bulk_ESAdocs_OCR")
+  outf <- gsub(outf, pattern = "pdf$|PDF$", replacement = "_OCR.pdf")
   cmd <- paste0("ocrmypdf ",
                 "--deskew ",
                 "--rotate-pages --rotate-pages-threshold 10 ",
@@ -29,9 +30,9 @@ OCR_proc <- function(infile) {
   }
 }
 
-OCR_PATH <- Sys.getenv("OCR_PATH")
+BULK_PATH <- Sys.getenv("BULK_PATH")
 infiles <- list.files(
-  OCR_PATH,
+  BULK_PATH,
   pattern = "pdf$|PDF$",
   full.names = TRUE,
   recursive = TRUE
@@ -45,10 +46,26 @@ cur_res <- mclapply(
 )
 
 cur_res_df <- data_frame(
-  files = infiles,
+  file = infiles,
   ocr_res = unlist(cur_res)
 )
 
-save(cur_res_df,
-     file = file.path(
-       OCR_PATH, "rda", paste0("cur_res_df_", Sys.Date(), ".rda")))
+for(i in 1:dim(cur_res_df)[1]) {
+  if(cur_res_df$ocr_res == 0) {
+    file.rename(
+      cur_res_df$file[i],
+      gsub(
+        cur_res_df$file[i],
+        pattern = "bulk_ESAdocs",
+        replacement = "bulk_ESAdocs_bak"
+      )
+    )
+  }
+}
+
+save(
+  cur_res_df,
+  file = file.path(
+    BULK_PATH, "rda",
+    paste0("cur_res_df_", Sys.Date(), ".rda"))
+)

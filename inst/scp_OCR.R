@@ -26,4 +26,8 @@ scp_cmd <- function(f) {
 scp_res <- lapply(infiles, scp_cmd)
 scp_res <- unlist(scp_res)
 cur_res <- data.frame(file = infiles, scp_res = scp_res)
-
+for(i in cur_res$file) {
+  if(cur_res$scp_res) {
+    file.rename(i, gsub(i, pattern = "bulk_ESAdocs_OCR", "bulk_ESAdocs_bak"))
+  }
+}
