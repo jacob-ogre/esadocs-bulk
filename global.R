@@ -11,9 +11,9 @@ library(shinyjs)
 library(shinythemes)
 library(stringr)
 
-system("touch /home/shiny/esadocs-upload/restart.txt", intern = FALSE)
-# readRenviron("/home/jacobmalcom/.Renviron")
-readRenviron("/Users/jacobmalcom/.Renviron")
+# system("touch /home/shiny/esadocs-bulk/restart.txt", intern = FALSE)
+readRenviron("/home/jacobmalcom/.Renviron")
+# readRenviron("/Users/jacobmalcom/.Renviron")
 
 elastic::connect()
 

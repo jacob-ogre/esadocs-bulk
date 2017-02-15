@@ -6,6 +6,8 @@
 library(dplyr)
 library(parallel)
 
+#' Use ocrmypdf to OCR a given infile; OCR version to bulk_ESAdocs_OCR
+#'
 OCR_proc <- function(infile) {
   outf <- gsub(infile, pattern = "bulk_ESAdocs", replacement = "bulk_ESAdocs_OCR")
   outf <- gsub(outf, pattern = "pdf$|PDF$", replacement = "_OCR.pdf")

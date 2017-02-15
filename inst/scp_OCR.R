@@ -5,7 +5,7 @@
 
 res <- try(readRenviron("/home/jacobmalcom/.Renviron"))
 
-OCR_PATH <- paste0(Sys.getenv("OCR_PATH"), "_OCR")
+OCR_PATH <- Sys.getenv("OCR_PATH")
 DOC_SERVER <- Sys.getenv("DOC_SERVER")
 STG_PATH <- Sys.getenv("STG_PATH")
 
@@ -28,6 +28,7 @@ scp_res <- unlist(scp_res)
 cur_res <- data.frame(file = infiles, scp_res = scp_res)
 for(i in cur_res$file) {
   if(cur_res$scp_res) {
-    file.rename(i, gsub(i, pattern = "bulk_ESAdocs_OCR", "bulk_ESAdocs_bak"))
+    file.rename(i, gsub(i, pattern = "bulk_ESAdocs_OCR",
+                        replacement = "bulk_ESAdocs_bak"))
   }
 }
