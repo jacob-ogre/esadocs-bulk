@@ -15,6 +15,7 @@ infiles <- list.files(
   full.names = TRUE,
   recursive = TRUE
 )
+
 if(length(infiles) == 0) stop("No files to move")
 
 scp_cmd <- function(f) {
