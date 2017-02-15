@@ -215,7 +215,8 @@ shinyServer(function(input, output, session) {
         "success",
         title = "Success!",
         content = paste("Your", dim(file_info())[1],
-                        "ESA-related PDFs were uploaded."),
+                        "ESA-related PDFs were uploaded. They will be processed",
+                        "and added to ESAdocs Search shortly."),
         style = "success",
         dismiss = TRUE
       )
