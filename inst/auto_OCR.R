@@ -41,6 +41,7 @@ infiles <- list.files(
   full.names = TRUE,
   recursive = TRUE
 )
+if(length(infiles) == 0) stop("No files to OCR")
 
 if(length(system("pgrep auto", intern = TRUE)) <= 1) {
   cur_res <- mclapply(
