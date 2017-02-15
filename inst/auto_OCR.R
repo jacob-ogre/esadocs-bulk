@@ -76,7 +76,7 @@ save(
   cur_res_df,
   file = file.path(
     BULK_PATH, "rda",
-    paste0("cur_res_df_",
+    paste0("auto_OCR_",
            gsub(Sys.time(), pattern = " |:", replacement = "_"),
            ".rda")
   )
