@@ -3,7 +3,7 @@
 #
 # This script lives on and is run on the OCR_SERVER side of life (of life!).
 
-res <- try(readRenviron("/home/jacobmalcom/.Renviron"))
+readRenviron("/home/jacobmalcom/.Renviron")
 
 OCR_PATH <- Sys.getenv("OCR_PATH")
 DOC_SERVER <- Sys.getenv("DOC_SERVER")

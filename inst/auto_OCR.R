@@ -3,6 +3,8 @@
 #
 # This script lives on and is run on the OCR_SERVER side of life (of life!).
 
+readRenviron("/home/jacobmalcom/.Renviron")
+
 library(dplyr)
 library(parallel)
 
@@ -10,7 +12,7 @@ library(parallel)
 #'
 OCR_proc <- function(infile) {
   outf <- gsub(infile, pattern = "bulk_ESAdocs", replacement = "bulk_ESAdocs_OCR")
-  outf <- gsub(outf, pattern = "pdf$|PDF$", replacement = "_OCR.pdf")
+  outf <- gsub(outf, pattern = "\\.pdf$|\\.PDF$", replacement = "_OCR.pdf")
   cmd <- paste0("ocrmypdf ",
                 "--deskew ",
                 "--rotate-pages --rotate-pages-threshold 10 ",
@@ -22,7 +24,7 @@ OCR_proc <- function(infile) {
                 outf)
   if(!file.exists(outf)) {
     res <- try(system(command = cmd, intern = FALSE, wait = TRUE))
-    if(res[1] == "try-error") {
+    if(class(res)[1] == "try-error") {
       return(res)
     } else {
       return(0)
@@ -40,12 +42,16 @@ infiles <- list.files(
   recursive = TRUE
 )
 
-cur_res <- mclapply(
-  X = infiles,
-  FUN = wrap_ocrmypdf,
-  mc.preschedule = FALSE,
-  mc.cores = 5
-)
+if(length(system("pgrep auto", intern = TRUE)) <= 1) {
+  cur_res <- mclapply(
+    X = infiles,
+    FUN = OCR_proc,
+    mc.preschedule = FALSE,
+    mc.cores = 5
+  )
+} else {
+  stop("Already running OCR.")
+}
 
 cur_res_df <- data_frame(
   file = infiles,
@@ -69,5 +75,8 @@ save(
   cur_res_df,
   file = file.path(
     BULK_PATH, "rda",
-    paste0("cur_res_df_", Sys.Date(), ".rda"))
+    paste0("cur_res_df_",
+           gsub(Sys.time(), pattern = " |:", replacement = "_"),
+           ".rda")
+  )
 )
