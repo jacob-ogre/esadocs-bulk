@@ -20,7 +20,7 @@ infiles <- list.files(
   full.names = TRUE,
   recursive = TRUE
 )
-if(length(infiles) == 0) stop("No files to accession")
+if(length(infiles) == 0) stop(paste("No files to accession", Sys.time()))
 
 rand_str <- function(len=30) {
   str <- paste(
@@ -70,3 +70,5 @@ save(acc_res,
               ".rda")
      )
 )
+
+message(paste("Completed accessions", Sys.time()))
