@@ -18,16 +18,16 @@ OCR_proc <- function(infile) {
                 "--rotate-pages --rotate-pages-threshold 10 ",
                 "--oversample 300 ",
                 "--skip-text ",
-                "-l eng --tesseract-config ~/asciimostly '",
+                "-l eng --tesseract-config ~/asciimostly ",
                 infile,
-                "' ",
+                " ",
                 outf)
   if(!file.exists(outf)) {
     res <- try(system(command = cmd, intern = FALSE, wait = TRUE))
     if(class(res)[1] == "try-error") {
-      return(res)
+      return(paste("Error", res[1]))
     } else {
-      return(0)
+      return(outf)
     }
   } else {
     return("File exists")
@@ -53,19 +53,17 @@ if(length(infiles) != 0) {
 
     cur_res_df <- data_frame(
       file = infiles,
-      ocr_res = unlist(cur_res)
+      ocrf = unlist(cur_res)
     )
 
     for(i in 1:dim(cur_res_df)[1]) {
-      if(cur_res_df$ocr_res == 0) {
-        file.rename(
-          cur_res_df$file[i],
-          gsub(
-            cur_res_df$file[i],
-            pattern = "bulk_ESAdocs",
-            replacement = "bulk_ESAdocs_bak"
-          )
-        )
+      if(!grepl(cur_res_df$ocrf[i], pattern = "^Error|File exists")) {
+        newf <- gsub(
+                  cur_res_df$file[i],
+                  pattern = "bulk_ESAdocs",
+                  replacement = "bulk_ESAdocs_bak"
+                )
+        file.rename(cur_res_df$file[i], newf)
       }
     }
 
