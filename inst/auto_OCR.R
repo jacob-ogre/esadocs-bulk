@@ -41,7 +41,7 @@ infiles <- list.files(
   full.names = TRUE,
   recursive = TRUE
 )
-if(length(infiles) == 0) stop("No files to OCR")
+if(length(infiles) == 0) stop(paste("No files to OCR", Sys.time()))
 
 if(length(system("pgrep auto", intern = TRUE)) <= 1) {
   cur_res <- mclapply(
@@ -51,7 +51,7 @@ if(length(system("pgrep auto", intern = TRUE)) <= 1) {
     mc.cores = 5
   )
 } else {
-  stop("Already running OCR.")
+  stop(paste("Already running OCR", Sys.time()))
 }
 
 cur_res_df <- data_frame(
@@ -81,3 +81,5 @@ save(
            ".rda")
   )
 )
+
+message(paste("OCR completed", Sys.time()))

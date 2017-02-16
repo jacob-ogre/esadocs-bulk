@@ -16,7 +16,7 @@ infiles <- list.files(
   recursive = TRUE
 )
 
-if(length(infiles) == 0) stop("No files to move")
+if(length(infiles) == 0) stop(paste("No files to move", Sys.time()))
 
 scp_cmd <- function(f) {
   dir <- basename(dirname(f))
@@ -46,3 +46,4 @@ save(
   )
 )
 
+message(paste("Completed scp to DOC_SERVER", Sys.time()))
