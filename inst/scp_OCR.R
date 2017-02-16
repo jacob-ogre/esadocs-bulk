@@ -16,34 +16,35 @@ infiles <- list.files(
   recursive = TRUE
 )
 
-if(length(infiles) == 0) stop(paste("No files to move", Sys.time()))
-
-scp_cmd <- function(f) {
-  dir <- basename(dirname(f))
-  cmd <- paste0("scp -C ", f, " ", DOC_SERVER, ":", STG_PATH, "/", dir)
-  res <- try(system(cmd, wait = TRUE, intern = TRUE))
-  if(class(res) == "try-error") return(FALSE)
-  return(TRUE)
-}
-
-scp_res <- lapply(infiles, scp_cmd)
-scp_res <- unlist(scp_res)
-cur_res <- data.frame(file = infiles, scp_res = scp_res, stringsAsFactors = FALSE)
-for(i in cur_res$file) {
-  if(cur_res$scp_res) {
-    file.rename(i, gsub(i, pattern = "bulk_ESAdocs_OCR",
-                        replacement = "bulk_ESAdocs_bak"))
+if(length(infiles) > 0) {
+  scp_cmd <- function(f) {
+    dir <- basename(dirname(f))
+    cmd <- paste0("scp -C ", f, " ", DOC_SERVER, ":", STG_PATH, "/", dir)
+    res <- try(system(cmd, wait = TRUE, intern = TRUE))
+    if(class(res) == "try-error") return(FALSE)
+    return(TRUE)
   }
-}
 
-save(
-  cur_res,
-  file = file.path(
-    BULK_PATH, "rda",
-    paste0("scp_OCR_",
-           gsub(Sys.time(), pattern = " |:", replacement = "_"),
-           ".rda")
+  scp_res <- lapply(infiles, scp_cmd)
+  scp_res <- unlist(scp_res)
+  cur_res <- data.frame(file = infiles, scp_res = scp_res, stringsAsFactors = FALSE)
+  for(i in cur_res$file) {
+    if(cur_res$scp_res) {
+      file.rename(i, gsub(i, pattern = "bulk_ESAdocs_OCR",
+                          replacement = "bulk_ESAdocs_bak"))
+    }
+  }
+
+  save(
+    cur_res,
+    file = file.path(
+      BULK_PATH, "rda",
+      paste0("scp_OCR_",
+             gsub(Sys.time(), pattern = " |:", replacement = "_"),
+             ".rda")
+    )
   )
-)
-
-message(paste("Completed scp to DOC_SERVER", Sys.time()))
+  print(paste("Completed scp to DOC_SERVER", Sys.time(), sep = "\t"))
+} else {
+  print(paste("No files to move", Sys.time(), sep = "\t"))
+}

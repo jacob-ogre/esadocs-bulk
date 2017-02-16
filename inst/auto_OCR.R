@@ -41,45 +41,47 @@ infiles <- list.files(
   full.names = TRUE,
   recursive = TRUE
 )
-if(length(infiles) == 0) stop(paste("No files to OCR", Sys.time()))
 
-if(length(system("pgrep auto", intern = TRUE)) <= 1) {
-  cur_res <- mclapply(
-    X = infiles,
-    FUN = OCR_proc,
-    mc.preschedule = FALSE,
-    mc.cores = 5
-  )
-} else {
-  stop(paste("Already running OCR", Sys.time()))
-}
+if(length(infiles) != 0) {
+  if(length(system("pgrep auto", intern = TRUE)) <= 1) {
+    cur_res <- mclapply(
+      X = infiles,
+      FUN = OCR_proc,
+      mc.preschedule = FALSE,
+      mc.cores = 5
+    )
 
-cur_res_df <- data_frame(
-  file = infiles,
-  ocr_res = unlist(cur_res)
-)
+    cur_res_df <- data_frame(
+      file = infiles,
+      ocr_res = unlist(cur_res)
+    )
 
-for(i in 1:dim(cur_res_df)[1]) {
-  if(cur_res_df$ocr_res == 0) {
-    file.rename(
-      cur_res_df$file[i],
-      gsub(
-        cur_res_df$file[i],
-        pattern = "bulk_ESAdocs",
-        replacement = "bulk_ESAdocs_bak"
+    for(i in 1:dim(cur_res_df)[1]) {
+      if(cur_res_df$ocr_res == 0) {
+        file.rename(
+          cur_res_df$file[i],
+          gsub(
+            cur_res_df$file[i],
+            pattern = "bulk_ESAdocs",
+            replacement = "bulk_ESAdocs_bak"
+          )
+        )
+      }
+    }
+
+    save(
+      cur_res_df,
+      file = file.path(
+        BULK_PATH, "rda",
+        paste0("auto_OCR_",
+               gsub(Sys.time(), pattern = " |:", replacement = "_"),
+               ".rda")
       )
     )
+    print(paste("OCR completed", Sys.time(), sep = "\t"))
+  } else {
+    print(paste("Already running an OCR job", Sys.time(), sep = "\t"))
   }
+} else {
+  print(paste("No files to OCR", Sys.time(), sep = "\t"))
 }
-
-save(
-  cur_res_df,
-  file = file.path(
-    BULK_PATH, "rda",
-    paste0("auto_OCR_",
-           gsub(Sys.time(), pattern = " |:", replacement = "_"),
-           ".rda")
-  )
-)
-
-message(paste("OCR completed", Sys.time()))
